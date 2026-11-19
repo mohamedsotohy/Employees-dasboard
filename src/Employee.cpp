@@ -4,8 +4,6 @@
 
 #include <mystring.h>
 
-#include <iostream>
-
 Employee::Employee(const char* name, int salary) {
   stringCopy(name, &this->name);  // similer to andrews problem
 

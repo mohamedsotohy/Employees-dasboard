@@ -3,7 +3,7 @@
 
 #include <iostream>
 int main() {
-  menu("YELLOW", 18, 9);
+  menu("CYAN", 4, 4);
   // sEmployee one = sEmployee("Ahmed", 3000);
   // std::cout << one.getName();
   // std::cout << one.getName();

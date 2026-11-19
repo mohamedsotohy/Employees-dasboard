@@ -15,17 +15,17 @@ void setColor(const char* color) {
   else if (strCmp(color, "GREEN"))
     std::cout << GREEN;
   else if (strCmp(color, "BLACK"))
-    std::cout << Black;
+    std::cout << BLACK;
   else if (strCmp(color, "YELLOW"))
     std::cout << YELLOW;
   else if (strCmp(color, "BLUE"))
     std::cout << BLUE;
   else if (strCmp(color, "MAGNETA"))
-    std::cout << Magenta;
+    std::cout << MAGENTA;
   else if (strCmp(color, "CYAN"))
-    std::cout << Cyan;
+    std::cout << CYAN;
   else if (strCmp(color, "WHITE"))
-    std::cout << White;
+    std::cout << WHITE;
   else
     std::cout << RESET;
 }

@@ -4,10 +4,10 @@
 #include <myprint.h>
 
 #include <iostream>
-void renderMenu(const char* color, int x, int y, int selected) {
+void renderMenu(const char* color, int x, int y, int marked) {
   gotoxy(x, y);
 
-  switch (selected) {
+  switch (marked) {
     case 0:
       gotoxy(x, y);
       setColor(color);
@@ -38,6 +38,7 @@ void renderMenu(const char* color, int x, int y, int selected) {
       gotoxy(x, ++y);
       setColor(color);
       std::cout << "Exit" << std::endl;
+      setColor("RESET");
       break;
 
     default:
@@ -45,17 +46,24 @@ void renderMenu(const char* color, int x, int y, int selected) {
   }
 }
 
-void menu(const char* color, int x = 0, int y = 0) {
-  std::cout
-      << "move with the arrow keys to test the program (press 'q' to quit):\n";
+void menu(const char* color, int x, int y, char type) {
+  std::cout << "Enter 's' for static array or 'd' for a dynamic array \n";
+  std::cin >> type;
 
   char byte1 = 'q';
   char byte2 = 'q';
   char byte3 = 'q';
 
   int selected = 0;
+  int currentIndex = 0;
+  int currentSize = 2;
+
+  Employee* dEmpArray = new Employee[currentSize];
+
+  Employee sEmpArray[currentSize];
 
   do {
+    setColor("CLEAR");
     renderMenu(color, x, y, selected);  // render first time
 
     // Read a key from the user
@@ -70,82 +78,102 @@ void menu(const char* color, int x = 0, int y = 0) {
         case 'A':  // ↑ Up Arrow
 
           selected = selected > 0 ? (selected - 1) : 2;
-          // renderMenu("green", x, y, selected); not needed
           break;
 
         case 'B':  // ↓ Down Arrow
           selected = (selected + 1) % 3;
-          // renderMenu("green", x, y, selected);  not needed
           break;
       }
-    } else if (byte1 == '\n' && selected == 0) {  // first op selected
+    } else if (byte1 == '\n') {
       setColor("CLEAR");
-      gotoxy(1, 1);
-      // std::cout << "Enter the number of employees to be added: \n";
-      // int size = 0;
-      // std::cin >> size;
-      // newEmpStatic(size);
-      newEmpDynamic();
+      switch (selected) {
+        case 0:  // new employee
+          if (type == 'd')
+            currentIndex = newEmpDynamic(&dEmpArray, currentIndex, currentSize);
+          else {
+            gotoxy(1, 1);
+            std::cout << "Enter the number of employees to be added: \n";
+            std::cin >> currentSize;
+            if (currentSize <= 0 || currentSize > 500) {
+              std::cout << "invalid size";
+              break;
+            }
+            currentIndex = newEmpStatic(sEmpArray, currentSize, currentIndex);
+          }
+
+          break;
+        case 1:  // display
+          type == 'd' ? display(currentIndex, dEmpArray)
+                      : display(currentIndex, sEmpArray);
+          break;
+        case 2:
+          byte1 = 'q';
+          break;
+
+        default:
+          break;
+      }
     }
 
-  } while (byte1 != 'q' && byte1 != 'Q' && byte1 != '\n');
+  } while (byte1 != 'q' && byte1 != 'Q');
 }
 
-void newEmpStatic(const int size) {
-  Employee
-      emparray[size];  // hade to make an empty constructor for this to work
-
-  for (int i = 0; i < size; i++) {
+int newEmpStatic(Employee* empArray, const int size, int currentIndex) {
+  for (; currentIndex < size; currentIndex++) {
     float salary = 0;
     char name[32];
-    std::cout << "Enter the name of employee number  " << i + 1 << " :";
+    std::cout << "Enter the name of employee number  " << currentIndex + 1
+              << " :";
     std::cin >> name;
 
-    std::cout << "Enter the salary of employee number  " << i + 1 << " :";
+    std::cout << "Enter the salary of employee number  " << currentIndex + 1
+              << " :";
     std::cin >> salary;
 
-    emparray[i] = Employee(name, salary);
+    empArray[currentIndex] = Employee(name, salary);
   }
-
-  std::cout << emparray[0].getName() << std::endl;
-  std::cout << emparray[1].getName() << std::endl;
+  return currentIndex;
 }
 
-void extendSize(Employee** emparray, int& currentSize) {
+void extendSize(Employee** empArray, int& currentSize) {
   Employee* temp = new Employee[currentSize * 2];
 
   for (int i = 0; i < currentSize; i++) {
-    temp[i] = (*emparray)[i];
+    temp[i] = (*empArray)[i];
   }
 
-  *emparray = temp;
+  *empArray = temp;
   currentSize *= 2;
 }
 
-void newEmpDynamic() {
-  int currentSize = 2;
-  Employee* emparray =
-      new Employee[currentSize];  // hade to make an empty constructor for this
-                                  // to work
+int newEmpDynamic(Employee** emparray, int currentIndex, int currentSize) {
   char flag;
-  int index = 0;
   do {
-    if (index == currentSize) extendSize(&emparray, currentSize);
+    if (currentIndex == currentSize) extendSize(emparray, currentSize);
     float salary = 0;
     char name[32];
-    std::cout << "Enter the name of employee number  " << index + 1 << " :";
+    std::cout << "Enter the name of employee number  " << currentIndex + 1
+              << " :";
     std::cin >> name;
 
-    std::cout << "Enter the salary of employee number  " << index + 1 << " :";
+    std::cout << "Enter the salary of employee number  " << currentIndex + 1
+              << " :";
     std::cin >> salary;
 
-    emparray[index] = Employee(name, salary);
-    index++;
+    (*emparray)[currentIndex] = Employee(name, salary);
+    currentIndex++;
     std::cout << "another employee => any char , quit => q \n";
     std::cin >> flag;
   } while (flag != 'q');
+  setColor("CLEAR");
+  return currentIndex;
+}
 
-  std::cout << emparray[0].getName() << std::endl;
-  std::cout << emparray[1].getName() << std::endl;
-  std::cout << emparray[2].getName() << std::endl;
+void display(int index, Employee* emparr) {
+  for (int i = 0; i < index; i++) {
+    std::cout << emparr[i].getName() << std::endl;
+  }
+  std::cout << "END OF DISPLAY PRESS ANY BUTTON TO PROCEED TO MAIN MENU"
+            << std::endl;
+  std::cin.get();
 }
