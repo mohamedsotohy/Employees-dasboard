@@ -9,5 +9,6 @@ struct Employee {
   Employee(const char* name, int salary);
   Employee();
   const char* getName();
+  float getSalary();
   void incSalary(float rate);
 };

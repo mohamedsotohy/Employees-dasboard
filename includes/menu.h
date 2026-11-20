@@ -1,3 +1,5 @@
+// class Employee;
+
 void renderMenu(const char* color, int x, int y, int selected);
 
 void menu(const char* color, int x = 0, int y = 0, char type = 'd');
