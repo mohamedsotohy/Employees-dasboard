@@ -2,8 +2,58 @@
 #include <arrowInput.h>
 #include <menu.h>
 #include <myprint.h>
+#include <mystring.h>
 
 #include <iostream>
+
+template <typename T>
+#define SKIPPED_CHARS 100000
+
+void validateNumber(T& src, T min, T max) {
+  while (!(std::cin >> src) || src < min || src > max) {
+    std::cout << "Invalid input. Please enter a number between " << min
+              << " and " << max << ": ";
+    std::cin.clear();
+    std::cin.ignore(SKIPPED_CHARS, '\n');
+  }
+  std::cin.ignore(SKIPPED_CHARS, '\n');
+}
+
+// void validateName(char* src, int min, int max) {
+//   bool valid;
+//   do {
+//     std::cin >> src;
+//     int size = getLength(src);
+//     valid = (size >= min && size <= max);
+
+//     if (!valid) {
+//       std::cout << "Invalid input. number of characters between " << min
+//                 << " and " << max << ": ";
+//       std::cin.clear();
+//       std::cin.ignore(SKIPPED_CHARS, '\n');
+//     }
+//   } while (!valid);
+//   std::cin.ignore(SKIPPED_CHARS, '\n');
+// }
+
+void validateName(char* src, int min, int max) {
+  std::cin.ignore(1, '\n');
+  bool valid = false;
+  while (!valid) {
+    std::cin.getline(src, max + 1);
+    if (std::cin.fail()) {  // line was longer than max
+      std::cin.clear();
+      std::cin.ignore(SKIPPED_CHARS, '\n');
+    } else {
+      valid = getLength(src) >= min;
+    }
+    if (!valid) {
+      std::cout << "Invalid input. number of characters between " << min
+                << " and " << max << ": ";
+    }
+  }
+}
+
 void renderMenu(const char* color, int x, int y, int marked) {
   gotoxy(x, y);
 
@@ -47,9 +97,6 @@ void renderMenu(const char* color, int x, int y, int marked) {
 }
 
 void menu(const char* color, int x, int y, char type) {
-  std::cout << "Enter 's' for static array or 'd' for a dynamic array \n";
-  std::cin >> type;
-
   char byte1 = 'q';
   char byte2 = 'q';
   char byte3 = 'q';
@@ -93,7 +140,7 @@ void menu(const char* color, int x, int y, char type) {
           else {
             gotoxy(1, 1);
             std::cout << "Enter the number of employees to be added: \n";
-            std::cin >> currentSize;
+            validateNumber(currentSize, 1, 100);
             if (currentSize <= 0 || currentSize > 500) {
               std::cout << "invalid size";
               break;
@@ -128,7 +175,7 @@ int newEmpStatic(Employee* empArray, const int size, int currentIndex) {
 
     std::cout << "Enter the salary of employee number  " << currentIndex + 1
               << " :";
-    std::cin >> salary;
+    validateNumber(salary, (float)100, (float)1000000);
 
     empArray[currentIndex] = Employee(name, salary);
   }
@@ -151,14 +198,14 @@ int newEmpDynamic(Employee** emparray, int currentIndex, int currentSize) {
   do {
     if (currentIndex == currentSize) extendSize(emparray, currentSize);
     float salary = 0;
-    char name[32];
+    char name[32] = {0};
     std::cout << "Enter the name of employee number  " << currentIndex + 1
               << " :";
-    std::cin >> name;
+    validateName(name, 1, 40);
 
     std::cout << "Enter the salary of employee number  " << currentIndex + 1
               << " :";
-    std::cin >> salary;
+    validateNumber(salary, (float)100, (float)1000000);
 
     (*emparray)[currentIndex] = Employee(name, salary);
     currentIndex++;
@@ -171,9 +218,13 @@ int newEmpDynamic(Employee** emparray, int currentIndex, int currentSize) {
 
 void display(int index, Employee* emparr) {
   for (int i = 0; i < index; i++) {
-    std::cout << emparr[i].getName() << std::endl;
+    std::cout << emparr[i].getName() << " : " << emparr[i].getSalary() << "$"
+              << std::endl;
   }
-  std::cout << "END OF DISPLAY PRESS ANY BUTTON TO PROCEED TO MAIN MENU"
+  std::cout << "END OF DISPLAY PRESS Enter TO PROCEED TO MAIN MENU"
             << std::endl;
+  std::cin.ignore();  // count =1 , delimter = '\n'
+                      // ignores one char consuming the leftover \n
+                      // fixing previous error
   std::cin.get();
 }

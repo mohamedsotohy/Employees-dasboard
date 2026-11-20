@@ -12,3 +12,4 @@ Employee::Employee(const char* name, int salary) {
 Employee::Employee() {}
 const char* Employee::getName() { return this->name; }
 void Employee::incSalary(float rate) { this->salary += this->salary * rate; }
+float Employee::getSalary() { return this->salary; }

@@ -4,8 +4,6 @@
 
 #include <mystring.h>
 
-// #include <iostream>
-
 int getLength(const char* word) {
   int count = 0;
   while (word[count] != '\0') count++;
